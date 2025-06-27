@@ -33,76 +33,97 @@
     <div class="container mx-auto bg-white shadow-lg rounded-xl p-6 md:p-8">
         <h1 class="text-3xl font-bold text-gray-800 mb-6 text-center">Registro de Consumo de Combustível</h1>
 
-        <!-- Form Section -->
-        <div class="mb-8 p-6 bg-blue-50 rounded-lg shadow-inner">
-            <h2 class="text-2xl font-semibold text-blue-800 mb-4">Adicionar Novo Abastecimento</h2>
-            <form id="fuelForm" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                    <label for="date" class="block text-gray-700 text-sm font-bold mb-2">Data:</label>
-                    <input type="date" id="date" class="shadow appearance-none border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-400" required>
-                </div>
-                <div>
-                    <label for="odometer" class="block text-gray-700 text-sm font-bold mb-2">Hodômetro (km):</label>
-                    <input type="number" id="odometer" class="shadow appearance-none border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-400" placeholder="Ex: 12345" min="0" required>
-                </div>
-                <div>
-                    <label for="liters" class="block text-gray-700 text-sm font-bold mb-2">Litros Abastecidos:</label>
-                    <input type="number" id="liters" class="shadow appearance-none border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-400" step="0.01" placeholder="Ex: 45.50" min="0.01" required>
-                </div>
-                <div>
-                    <label for="price" class="block text-gray-700 text-sm font-bold mb-2">Preço por Litro (R$):</label>
-                    <input type="number" id="price" class="shadow appearance-none border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-400" step="0.01" placeholder="Ex: 5.89" min="0.01" required>
-                </div>
-                <!-- New Fuel Type Select Input -->
-                <div>
-                    <label for="fuelType" class="block text-gray-700 text-sm font-bold mb-2">Tipo de Combustível:</label>
-                    <select id="fuelType" class="shadow appearance-none border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-400" required>
-                        <option value="">Selecione o tipo</option>
-                        <option value="Etanol">Etanol</option>
-                        <option value="Gasolina">Gasolina</option>
-                        <option value="Gasolina Aditivada">Gasolina Aditivada</option>
-                    </select>
-                </div>
-                <div class="md:col-span-2 flex justify-center mt-4">
-                    <button type="submit" id="submitButton" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-300 ease-in-out shadow-md">
-                        Adicionar Registro
-                    </button>
-                </div>
-            </form>
+        <!-- Login/Placa Input Section -->
+        <div id="loginSection" class="text-center p-6 bg-purple-50 rounded-lg shadow-inner mb-8 hidden">
+            <h2 class="text-2xl font-semibold text-purple-800 mb-4">Acessar por Placa do Veículo</h2>
+            <p class="text-gray-600 mb-4">Informe a placa do veículo para acessar ou criar um novo registro.</p>
+            <div class="flex flex-col items-center gap-4">
+                <input type="text" id="licensePlateInput" placeholder="Ex: ABC1234" class="shadow appearance-none border rounded-lg w-full max-w-xs py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-purple-400 uppercase text-center" maxlength="7">
+                <button id="accessByPlateButton" class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-6 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 transition duration-300 ease-in-out shadow-md">
+                    Acessar Registros
+                </button>
+            </div>
         </div>
 
-        <!-- Records Table Section -->
-        <div class="overflow-x-auto mb-8">
-            <h2 class="text-2xl font-semibold text-gray-800 mb-4">Meus Registros</h2>
-            <table class="min-w-full bg-white border border-gray-200 rounded-lg shadow-md">
-                <thead>
-                    <tr class="bg-gray-100 text-gray-600 uppercase text-sm leading-normal">
-                        <th class="py-3 px-6 text-left">Data</th>
-                        <th class="py-3 px-6 text-left">Hodômetro (km)</th>
-                        <th class="py-3 px-6 text-left">Litros</th>
-                        <th class="py-3 px-6 text-left">R$/Litro</th>
-                        <th class="py-3 px-6 text-left">Custo Total (R$)</th>
-                        <th class="py-3 px-6 text-left">Consumo (km/L)</th>
-                        <th class="py-3 px-6 text-left">Combustível</th> <!-- New column header -->
-                        <th class="py-3 px-6 text-left">Ações</th>
-                    </tr>
-                </thead>
-                <tbody id="fuelTableBody" class="text-gray-700 text-sm font-light">
-                    <!-- Fuel records will be inserted here by JavaScript -->
-                </tbody>
-            </table>
-            <p id="noRecordsMessage" class="text-gray-500 text-center py-4">Nenhum registro ainda. Adicione um para começar!</p>
-        </div>
+        <!-- Main App Content (hidden initially) -->
+        <div id="appContent" class="hidden">
+            <!-- Form Section -->
+            <div class="mb-8 p-6 bg-blue-50 rounded-lg shadow-inner">
+                <h2 class="text-2xl font-semibold text-blue-800 mb-4">Adicionar Novo Abastecimento</h2>
+                <form id="fuelForm" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label for="date" class="block text-gray-700 text-sm font-bold mb-2">Data:</label>
+                        <input type="date" id="date" class="shadow appearance-none border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-400" required>
+                    </div>
+                    <div>
+                        <label for="odometer" class="block text-gray-700 text-sm font-bold mb-2">Hodômetro (km):</label>
+                        <input type="number" id="odometer" class="shadow appearance-none border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-400" placeholder="Ex: 12345" min="0" required>
+                    </div>
+                    <div>
+                        <label for="liters" class="block text-gray-700 text-sm font-bold mb-2">Litros Abastecidos:</label>
+                        <input type="number" id="liters" class="shadow appearance-none border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-400" step="0.01" placeholder="Ex: 45.50" min="0.01" required>
+                    </div>
+                    <div>
+                        <label for="price" class="block text-gray-700 text-sm font-bold mb-2">Preço por Litro (R$):</label>
+                        <input type="number" id="price" class="shadow appearance-none border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-400" step="0.01" placeholder="Ex: 5.89" min="0.01" required>
+                    </div>
+                    <!-- Fuel Type Select Input -->
+                    <div>
+                        <label for="fuelType" class="block text-gray-700 text-sm font-bold mb-2">Tipo de Combustível:</label>
+                        <select id="fuelType" class="shadow appearance-none border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-400" required>
+                            <option value="">Selecione o tipo</option>
+                            <option value="Etanol">Etanol</option>
+                            <option value="Gasolina">Gasolina</option>
+                            <option value="Gasolina Aditivada">Gasolina Aditivada</option>
+                        </select>
+                    </div>
+                    <div class="md:col-span-2 flex justify-center mt-4">
+                        <button type="submit" id="submitButton" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-300 ease-in-out shadow-md">
+                            Adicionar Registro
+                        </button>
+                    </div>
+                </form>
+            </div>
 
-        <!-- Summary Section -->
-        <div class="bg-green-50 rounded-lg shadow-inner p-6">
-            <h2 class="text-2xl font-semibold text-green-800 mb-4">Resumo Geral</h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                    <p class="text-gray-700 font-bold">Consumo Médio (km/L): <span id="avgConsumption" class="font-normal text-lg text-green-700">--</span></p>
-                </div>
-                <div>
-                    <p class="text-gray-700 font-bold">Custo Total Registrado (R$): <span id="totalCost" class="font-normal text-lg text-green-700">--</span></p>
+            <!-- Records Table Section -->
+            <div class="overflow-x-auto mb-8">
+                <h2 class="text-2xl font-semibold text-gray-800 mb-4">Meus Registros</h2>
+                <table class="min-w-full bg-white border border-gray-200 rounded-lg shadow-md">
+                    <thead>
+                        <tr class="bg-gray-100 text-gray-600 uppercase text-sm leading-normal">
+                            <th class="py-3 px-6 text-left">Data</th>
+                            <th class="py-3 px-6 text-left">Hodômetro (km)</th>
+                            <th class="py-3 px-6 text-left">Litros</th>
+                            <th class="py-3 px-6 text-left">R$/Litro</th>
+                            <th class="py-3 px-6 text-left">Custo Total (R$)</th>
+                            <th class="py-3 px-6 text-left">Consumo (km/L)</th>
+                            <th class="py-3 px-6 text-left">Combustível</th>
+                            <th class="py-3 px-6 text-left">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="fuelTableBody" class="text-gray-700 text-sm font-light">
+                        <!-- Fuel records will be inserted here by JavaScript -->
+                    </tbody>
+                </table>
+                <p id="noRecordsMessage" class="text-gray-500 text-center py-4">Nenhum registro ainda. Adicione um para começar!</p>
+            </div>
+
+            <!-- Summary Section -->
+            <div class="bg-green-50 rounded-lg shadow-inner p-6">
+                <h2 class="text-2xl font-semibold text-green-800 mb-4">Resumo Geral</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <p class="text-gray-700 font-bold">Consumo Médio (km/L): <span id="avgConsumption" class="font-normal text-lg text-green-700">--</span></p>
+                    </div>
+                    <div>
+                        <p class="text-gray-700 font-bold">Custo Total Registrado (R$): <span id="totalCost" class="font-normal text-lg text-green-700">--</span></p>
+                    </div>
+                    <div class="md:col-span-2 text-center mt-4">
+                        <p id="currentLicensePlateDisplay" class="text-gray-600 text-sm">Placa Atual: --</p>
+                        <button id="changePlateButton" class="mt-2 bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-1 px-4 rounded-lg text-sm transition duration-300 ease-in-out shadow-sm">
+                            Trocar Veículo / Sair
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -117,27 +138,47 @@
     </div>
 
 
-    <script>
+    <script type="module">
+        // Import Firebase modules
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getFirestore, collection, doc, addDoc, setDoc, deleteDoc, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Global Firebase variables
+        let app;
+        let db;
+        let licensePlate = null; // This will now be our "userId" for data segregation
+
+        // Global variables provided by the Canvas environment
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
+
         // Get references to DOM elements
+        const loginSection = document.getElementById('loginSection');
+        const licensePlateInput = document.getElementById('licensePlateInput');
+        const accessByPlateButton = document.getElementById('accessByPlateButton');
+        const appContent = document.getElementById('appContent');
         const fuelForm = document.getElementById('fuelForm');
         const dateInput = document.getElementById('date');
         const odometerInput = document.getElementById('odometer');
         const litersInput = document.getElementById('liters');
         const priceInput = document.getElementById('price');
-        const fuelTypeInput = document.getElementById('fuelType'); // New: Fuel Type input
+        const fuelTypeInput = document.getElementById('fuelType');
         const submitButton = document.getElementById('submitButton');
         const fuelTableBody = document.getElementById('fuelTableBody');
         const avgConsumptionSpan = document.getElementById('avgConsumption');
         const totalCostSpan = document.getElementById('totalCost');
         const noRecordsMessage = document.getElementById('noRecordsMessage');
+        const currentLicensePlateDisplay = document.getElementById('currentLicensePlateDisplay');
+        const changePlateButton = document.getElementById('changePlateButton');
 
         const messageBox = document.getElementById('messageBox');
         const messageBoxText = document.getElementById('messageBoxText');
         const messageBoxClose = document.getElementById('messageBoxClose');
 
-        // Array to store fuel records
+        // Array to store fuel records locally (synced with Firestore)
         let fuelRecords = [];
-        let editingIndex = null; // To keep track of the record being edited
+        let editingRecordId = null; // To keep track of the Firestore document ID being edited
+        let unsubscribeFromFirestore = null; // To store the unsubscribe function for Firestore listener
 
         // Function to show custom message box
         function showMessageBox(message) {
@@ -145,34 +186,68 @@
             messageBox.classList.remove('hidden');
         }
 
-        // Event listener for message box close button
+        // Event listener for message box close button (for simple "OK" messages)
         messageBoxClose.addEventListener('click', () => {
             messageBox.classList.add('hidden');
-            // Re-add the single "OK" button for general messages
-            const messageBoxButtons = messageBox.querySelector('.p-6');
-            messageBoxButtons.innerHTML = ''; // Clear existing content
-            messageBoxButtons.appendChild(messageBoxText); // Re-add the text
-            const okButton = document.createElement('button');
-            okButton.id = 'messageBoxClose'; // Ensure it has the correct ID
-            okButton.textContent = 'OK';
-            okButton.classList.add('bg-blue-600', 'hover:bg-blue-700', 'text-white', 'font-bold', 'py-2', 'px-4', 'rounded-lg', 'focus:outline-none', 'focus:ring-2', 'focus:ring-blue-500');
-            messageBoxButtons.appendChild(okButton);
-            okButton.addEventListener('click', () => messageBox.classList.add('hidden')); // Add back listener
+            // Ensure only the single 'OK' button exists for general messages
+            const messageBoxButtonsContainer = messageBox.querySelector('.p-6');
+            // Remove any 'Sim'/'Não' buttons that might be present from a previous confirm() call
+            const simButton = messageBoxButtonsContainer.querySelector('.bg-red-600');
+            const naoButton = messageBoxButtonsContainer.querySelector('.bg-gray-400');
+            if (simButton) simButton.remove();
+            if (naoButton) naoButton.remove();
+
+            // Re-add the single "OK" button if it was removed or isn't present
+            let currentOkButton = messageBoxButtonsContainer.querySelector('#messageBoxClose');
+            if (!currentOkButton) {
+                currentOkButton = document.createElement('button');
+                currentOkButton.id = 'messageBoxClose';
+                currentOkButton.textContent = 'OK';
+                currentOkButton.classList.add('bg-blue-600', 'hover:bg-blue-700', 'text-white', 'font-bold', 'py-2', 'px-4', 'rounded-lg', 'focus:outline-none', 'focus:ring-2', 'focus:ring-blue-500');
+                messageBoxButtonsContainer.appendChild(currentOkButton);
+                currentOkButton.addEventListener('click', () => messageBox.classList.add('hidden'));
+            }
         });
 
+        // Override default confirm with custom message box for deletion
+        window.confirm = function(message) {
+            return new Promise((resolve) => {
+                messageBoxText.textContent = message;
+                messageBox.classList.remove('hidden');
 
-        // Function to save records to localStorage
-        function saveRecords() {
-            localStorage.setItem('fuelRecords', JSON.stringify(fuelRecords));
-        }
+                const messageBoxButtonsContainer = messageBox.querySelector('.p-6');
+                // Remove the default "OK" button if it exists
+                const existingOkButton = messageBoxButtonsContainer.querySelector('#messageBoxClose');
+                if (existingOkButton) {
+                    existingOkButton.remove();
+                }
 
-        // Function to load records from localStorage
-        function loadRecords() {
-            const storedRecords = localStorage.getItem('fuelRecords');
-            if (storedRecords) {
-                fuelRecords = JSON.parse(storedRecords);
-            }
-        }
+                const okButton = document.createElement('button');
+                okButton.textContent = 'Sim';
+                okButton.classList.add('bg-red-600', 'hover:bg-red-700', 'text-white', 'font-bold', 'py-2', 'px-4', 'rounded-lg', 'focus:outline-none', 'focus:ring-2', 'focus:ring-red-500', 'mr-2');
+                okButton.onclick = () => {
+                    messageBox.classList.add('hidden');
+                    // Remove these buttons after action
+                    okButton.remove();
+                    cancelButton.remove();
+                    resolve(true);
+                };
+
+                const cancelButton = document.createElement('button');
+                cancelButton.textContent = 'Não';
+                cancelButton.classList.add('bg-gray-400', 'hover:bg-gray-500', 'text-white', 'font-bold', 'py-2', 'px-4', 'rounded-lg', 'focus:outline-none', 'focus:ring-2', 'focus:ring-gray-500');
+                cancelButton.onclick = () => {
+                    messageBox.classList.add('hidden');
+                    // Remove these buttons
+                    okButton.remove();
+                    cancelButton.remove();
+                    resolve(false);
+                };
+
+                messageBoxButtonsContainer.appendChild(okButton);
+                messageBoxButtonsContainer.appendChild(cancelButton);
+            });
+        };
 
         // Function to calculate fuel consumption (km/L)
         function calculateConsumption(prevOdometer, currentOdometer, liters) {
@@ -194,9 +269,7 @@
                 let totalCost = 0;
                 let totalDistance = 0;
 
-                // Sort records by odometer to ensure correct consumption calculation
-                fuelRecords.sort((a, b) => a.odometer - b.odometer);
-
+                // fuelRecords are already sorted by odometer due to Firestore query
                 fuelRecords.forEach((record, index) => {
                     const row = fuelTableBody.insertRow();
                     row.classList.add('border-b', 'border-gray-200', 'hover:bg-gray-50');
@@ -225,20 +298,20 @@
                     row.insertCell(3).textContent = record.price.toFixed(2);
                     row.insertCell(4).textContent = recordTotalCost;
                     row.insertCell(5).textContent = consumption !== null ? consumption.toFixed(2) : '-';
-                    row.insertCell(6).textContent = record.fuelType || '-'; // New: Display fuel type
+                    row.insertCell(6).textContent = record.fuelType || '-';
 
                     // Add action buttons (Edit and Delete)
-                    const actionsCell = row.insertCell(7); // Adjusted index for new column
+                    const actionsCell = row.insertCell(7);
                     const editButton = document.createElement('button');
                     editButton.textContent = 'Editar';
                     editButton.classList.add('action-button', 'edit-button', 'mr-2');
-                    editButton.onclick = () => editRecord(index);
+                    editButton.onclick = () => editRecord(record.id); // Pass record ID
                     actionsCell.appendChild(editButton);
 
                     const deleteButton = document.createElement('button');
                     deleteButton.textContent = 'Excluir';
                     deleteButton.classList.add('action-button', 'delete-button');
-                    deleteButton.onclick = () => deleteRecord(index);
+                    deleteButton.onclick = () => deleteRecord(record.id); // Pass record ID
                     actionsCell.appendChild(deleteButton);
 
                     totalCost += parseFloat(recordTotalCost);
@@ -255,82 +328,141 @@
             }
         }
 
-        // Function to edit a record
-        function editRecord(index) {
-            editingIndex = index;
-            const recordToEdit = fuelRecords[index];
-
-            // Populate the form fields with the record's data
-            dateInput.value = recordToEdit.date;
-            odometerInput.value = recordToEdit.odometer;
-            litersInput.value = recordToEdit.liters;
-            priceInput.value = recordToEdit.price;
-            fuelTypeInput.value = recordToEdit.fuelType || ''; // New: Set fuel type
-
-            // Change the submit button text
-            submitButton.textContent = 'Atualizar Registro';
-            submitButton.classList.remove('bg-blue-600', 'hover:bg-blue-700');
-            submitButton.classList.add('bg-green-600', 'hover:bg-green-700');
-        }
-
-        // Function to delete a record
-        async function deleteRecord(index) {
-            const confirmed = await window.confirm('Tem certeza que deseja excluir este registro?');
-            if (confirmed) {
-                fuelRecords.splice(index, 1); // Remove the record from the array
-                saveRecords(); // Save changes to localStorage
-                renderRecords(); // Re-render the table
-                showMessageBox('Registro excluído com sucesso!');
+        // Firestore functions
+        async function addRecordToFirestore(record) {
+            try {
+                // Collection path: /artifacts/{appId}/users/{licensePlate}/fuelRecords
+                const recordsCollectionRef = collection(db, `artifacts/${appId}/users/${licensePlate}/fuelRecords`);
+                // Add a timestamp for consistent ordering and uniqueness
+                const docRef = await addDoc(recordsCollectionRef, { ...record, timestamp: new Date() });
+                return docRef.id; // Return the new document ID
+            } catch (e) {
+                console.error("Erro ao adicionar documento: ", e);
+                showMessageBox("Erro ao salvar o registro. Tente novamente.");
+                return null;
             }
         }
 
-        // Override default confirm with custom message box for deletion
-        window.confirm = function(message) {
-            // Display custom message box with OK and Cancel buttons
-            messageBoxText.textContent = message;
-            messageBox.classList.remove('hidden');
+        async function updateRecordInFirestore(recordId, record) {
+            try {
+                const recordDocRef = doc(db, `artifacts/${appId}/users/${licensePlate}/fuelRecords`, recordId);
+                await setDoc(recordDocRef, record); // setDoc replaces the document entirely
+            } catch (e) {
+                console.error("Erro ao atualizar documento: ", e);
+                showMessageBox("Erro ao atualizar o registro. Tente novamente.");
+            }
+        }
 
-            return new Promise((resolve) => {
-                const okButton = document.createElement('button');
-                okButton.textContent = 'Sim';
-                okButton.classList.add('bg-red-600', 'hover:bg-red-700', 'text-white', 'font-bold', 'py-2', 'px-4', 'rounded-lg', 'focus:outline-none', 'focus:ring-2', 'focus:ring-red-500', 'mr-2');
-                okButton.onclick = () => {
-                    messageBox.classList.add('hidden');
-                    resolve(true);
-                    // Remove buttons after action
-                    okButton.remove();
-                    cancelButton.remove();
-                };
+        async function deleteRecordFromFirestore(recordId) {
+            try {
+                const recordDocRef = doc(db, `artifacts/${appId}/users/${licensePlate}/fuelRecords`, recordId);
+                await deleteDoc(recordDocRef);
+            } catch (e) {
+                console.error("Erro ao excluir documento: ", e);
+                showMessageBox("Erro ao excluir o registro. Tente novamente.");
+            }
+        }
 
-                const cancelButton = document.createElement('button');
-                cancelButton.textContent = 'Não';
-                cancelButton.classList.add('bg-gray-400', 'hover:bg-gray-500', 'text-white', 'font-bold', 'py-2', 'px-4', 'rounded-lg', 'focus:outline-none', 'focus:ring-2', 'focus:ring-gray-500');
-                cancelButton.onclick = () => {
-                    messageBox.classList.add('hidden');
-                    resolve(false);
-                    // Remove buttons after action
-                    okButton.remove();
-                    cancelButton.remove();
-                };
+        // Function to listen to real-time updates from Firestore
+        function listenToFuelRecords() {
+            // Unsubscribe from previous listener if exists
+            if (unsubscribeFromFirestore) {
+                unsubscribeFromFirestore();
+            }
 
-                // Clear previous buttons and add new ones for confirmation
-                const messageBoxButtonsContainer = messageBox.querySelector('.p-6');
-                // Ensure the messageBoxText is still present if it was re-added.
-                // Re-add it just in case if it's missing, but it should typically be there.
-                if (!messageBoxButtonsContainer.contains(messageBoxText)) {
-                    messageBoxButtonsContainer.prepend(messageBoxText);
-                }
-                // Remove existing OK button if it's there from a previous showMessageBox call
-                const existingOkButton = messageBoxButtonsContainer.querySelector('#messageBoxClose');
-                if (existingOkButton) {
-                    existingOkButton.remove();
-                }
+            if (!db || !licensePlate) {
+                console.log("Firestore ou Placa do Veículo não prontos para ouvir registros.");
+                return;
+            }
+            const recordsCollectionRef = collection(db, `artifacts/${appId}/users/${licensePlate}/fuelRecords`);
+            // Order by odometer to ensure correct calculation and display sequence
+            const q = query(recordsCollectionRef, orderBy("odometer", "asc"));
 
-                messageBoxButtonsContainer.appendChild(okButton);
-                messageBoxButtonsContainer.appendChild(cancelButton);
+            unsubscribeFromFirestore = onSnapshot(q, (snapshot) => {
+                fuelRecords = [];
+                snapshot.forEach((doc) => {
+                    // Add the Firestore document ID to the local record object
+                    fuelRecords.push({ id: doc.id, ...doc.data() });
+                });
+                renderRecords(); // Re-render every time data changes in Firestore
+            }, (error) => {
+                console.error("Erro ao ouvir registros: ", error);
+                showMessageBox("Erro ao carregar registros em tempo real. Tente recarregar.");
             });
-        };
+        }
 
+        // Function to set the license plate and display app content
+        function setLicensePlate(plate) {
+            licensePlate = plate.toUpperCase(); // Store in uppercase for consistency
+            localStorage.setItem('currentLicensePlate', licensePlate); // Save to local storage
+            currentLicensePlateDisplay.textContent = `Placa Atual: ${licensePlate}`;
+            loginSection.classList.add('hidden');
+            appContent.classList.remove('hidden');
+            listenToFuelRecords(); // Start listening for data for this plate
+        }
+
+        // Function to clear license plate and return to login
+        function clearLicensePlate() {
+            localStorage.removeItem('currentLicensePlate');
+            licensePlate = null;
+            if (unsubscribeFromFirestore) { // Stop listening to old data
+                unsubscribeFromFirestore();
+                unsubscribeFromFirestore = null;
+            }
+            fuelRecords = []; // Clear local data
+            renderRecords(); // Clear table
+            loginSection.classList.remove('hidden');
+            appContent.classList.add('hidden');
+            licensePlateInput.value = ''; // Clear input field
+            showMessageBox('Sessão encerrada. Informe uma nova placa para continuar.');
+        }
+
+        // Event listener for "Acessar Registros" button
+        accessByPlateButton.addEventListener('click', () => {
+            const plate = licensePlateInput.value.trim();
+            if (plate.length > 0) {
+                setLicensePlate(plate);
+            } else {
+                showMessageBox('Por favor, digite a placa do veículo.');
+            }
+        });
+
+        // Event listener for "Trocar Veículo / Sair" button
+        changePlateButton.addEventListener('click', () => {
+            clearLicensePlate();
+        });
+
+        // Function to edit a record
+        function editRecord(recordId) {
+            editingRecordId = recordId;
+            const recordToEdit = fuelRecords.find(record => record.id === recordId);
+
+            if (recordToEdit) {
+                // Populate the form fields with the record's data
+                dateInput.value = recordToEdit.date;
+                odometerInput.value = recordToEdit.odometer;
+                litersInput.value = recordToEdit.liters;
+                priceInput.value = recordToEdit.price;
+                fuelTypeInput.value = recordToEdit.fuelType || '';
+
+                // Change the submit button text
+                submitButton.textContent = 'Atualizar Registro';
+                submitButton.classList.remove('bg-blue-600', 'hover:bg-blue-700');
+                submitButton.classList.add('bg-green-600', 'hover:bg-green-700');
+            } else {
+                showMessageBox('Registro não encontrado para edição.');
+            }
+        }
+
+        // Function to delete a record
+        async function deleteRecord(recordId) {
+            const confirmed = await window.confirm('Tem certeza que deseja excluir este registro?');
+            if (confirmed) {
+                await deleteRecordFromFirestore(recordId); // Delete from Firestore
+                showMessageBox('Registro excluído com sucesso!');
+                // onSnapshot will handle re-rendering
+            }
+        }
 
         // Event listener for form submission
         fuelForm.addEventListener('submit', async (e) => {
@@ -341,7 +473,7 @@
             const odometer = parseFloat(odometerInput.value);
             const liters = parseFloat(litersInput.value);
             const price = parseFloat(priceInput.value);
-            const fuelType = fuelTypeInput.value; // New: Get fuel type
+            const fuelType = fuelTypeInput.value;
 
             // Basic validation
             if (isNaN(odometer) || isNaN(liters) || isNaN(price) || odometer < 0 || liters <= 0 || price <= 0 || !fuelType) {
@@ -349,74 +481,59 @@
                 return;
             }
 
-            // Check if odometer reading is greater than the last one (if any)
-            if (editingIndex === null && fuelRecords.length > 0) { // Only check for new records
-                const lastOdometer = fuelRecords.reduce((max, record) => Math.max(max, record.odometer), 0);
-                if (odometer <= lastOdometer) {
-                    showMessageBox('O hodômetro atual (' + odometer.toFixed(0) + ' km) deve ser maior que o último registro (' + lastOdometer.toFixed(0) + ' km).');
-                    return;
-                }
-            } else if (editingIndex !== null) { // If editing, ensure the new odometer is still valid relative to its neighbors
-                // Create a temporary array excluding the current editing record to check against
-                const tempRecords = fuelRecords.filter((_, idx) => idx !== editingIndex);
-                const sortedTempRecords = [...tempRecords].sort((a, b) => a.odometer - b.odometer);
-
-                let isValidOdometer = true;
-                // Check if the edited odometer is between its potential new neighbors
-                for (let i = 0; i < sortedTempRecords.length; i++) {
-                    if (odometer < sortedTempRecords[i].odometer) {
-                        if (i > 0 && odometer < sortedTempRecords[i-1].odometer) {
-                            isValidOdometer = false;
-                            break;
-                        }
-                    } else if (odometer === sortedTempRecords[i].odometer) {
-                        isValidOdometer = false; // Cannot have duplicate odometers
-                        break;
-                    }
-                }
-
-                if (!isValidOdometer) {
-                    showMessageBox('O hodômetro atual deve ser maior que o registro anterior e menor que o próximo registro (se houver).');
-                    return;
-                }
-            }
-
-
-            // Create or update record object
-            const newRecord = {
+            // Create or update record object (excluding the 'id' for Firestore updates)
+            const recordData = {
                 date: date,
                 odometer: odometer,
                 liters: liters,
                 price: price,
-                fuelType: fuelType // New: Add fuel type to the record
+                fuelType: fuelType
             };
 
-            if (editingIndex !== null) {
-                // Update existing record
-                fuelRecords[editingIndex] = newRecord;
+            if (editingRecordId !== null) {
+                // Update existing record in Firestore
+                await updateRecordInFirestore(editingRecordId, recordData);
                 showMessageBox('Registro atualizado com sucesso!');
-                editingIndex = null; // Reset editing state
+                editingRecordId = null; // Reset editing state
                 submitButton.textContent = 'Adicionar Registro'; // Reset button text
                 submitButton.classList.remove('bg-green-600', 'hover:bg-green-700');
                 submitButton.classList.add('bg-blue-600', 'hover:bg-blue-700');
             } else {
-                // Add new record
-                fuelRecords.push(newRecord);
+                // Check if odometer reading is greater than the last one for new records
+                if (fuelRecords.length > 0) {
+                    const lastOdometer = fuelRecords[fuelRecords.length - 1].odometer; // Already sorted by odometer
+                    if (odometer <= lastOdometer) {
+                        showMessageBox('O hodômetro atual (' + odometer.toFixed(0) + ' km) deve ser maior que o último registro (' + lastOdometer.toFixed(0) + ' km).');
+                        return;
+                    }
+                }
+                // Add new record to Firestore
+                await addRecordToFirestore(recordData);
                 showMessageBox('Registro adicionado com sucesso!');
             }
-
-            saveRecords(); // Save changes to localStorage
-            renderRecords(); // Re-render the records and update summary
 
             // Clear the form fields
             fuelForm.reset();
             fuelTypeInput.value = ""; // Reset fuel type combobox
         });
 
-        // Initial load and render on page load
-        document.addEventListener('DOMContentLoaded', () => {
-            loadRecords();
-            renderRecords();
+        // Initial Firebase setup and load license plate from local storage
+        document.addEventListener('DOMContentLoaded', async () => {
+            if (Object.keys(firebaseConfig).length > 0) {
+                app = initializeApp(firebaseConfig);
+                db = getFirestore(app);
+
+                const storedPlate = localStorage.getItem('currentLicensePlate');
+                if (storedPlate) {
+                    setLicensePlate(storedPlate);
+                } else {
+                    loginSection.classList.remove('hidden'); // Show login section if no plate is stored
+                }
+            } else {
+                console.error("Firebase config is missing. Data persistence will not work.");
+                showMessageBox("Configuração do Firebase ausente. Os dados não serão salvos.");
+                loginSection.classList.remove('hidden'); // Show login section anyway
+            }
         });
     </script>
 </body>
