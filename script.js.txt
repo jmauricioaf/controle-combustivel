@@ -2,10 +2,20 @@
 const SUPABASE_URL = 'https://cauuxhfljaxnkdrbgkso.supabase.co'; // Ex: 'https://abcdefghijk.supabase.co'
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNhdXV4aGZsamF4bmtkcmJna3NvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE3NDE4NTQsImV4cCI6MjA2NzMxNzg1NH0.R6LarbWyV6I51TiBRtm_ORRkyNdxwN1oVXx0ELMTwNE'; // Ex: 'eyJhbGciOiJIUzI1Ni...'
 
+
 const supabase = Supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+// Elementos da tela de login
+const loginScreen = document.getElementById('loginScreen');
+const loginForm = document.getElementById('loginForm');
+const placaLoginInput = document.getElementById('placaLoginInput');
+const loginMessage = document.getElementById('loginMessage');
+
+// Elementos do conteúdo principal do aplicativo
+const appContent = document.getElementById('appContent');
+const currentVehiclePlate = document.getElementById('currentVehiclePlate'); // Para exibir a placa logada
 const registroForm = document.getElementById('registroForm');
-const placaInput = document.getElementById('placaInput');
+const placaInput = document.getElementById('placaInput'); // Hidden input para a placa
 const valorLitroInput = document.getElementById('valorLitroInput');
 const quantidadeLitrosInput = document.getElementById('quantidadeLitrosInput');
 const precoTotalInput = document.getElementById('precoTotalInput');
@@ -13,15 +23,61 @@ const quilometragemInput = document.getElementById('quilometragemInput');
 const tipoCombustivelSelect = document.getElementById('tipoCombustivelSelect');
 const formMessage = document.getElementById('formMessage');
 
-const placaConsultaInput = document.getElementById('placaConsultaInput');
-const consultarPlacaBtn = document.getElementById('consultarPlacaBtn');
 const registrosTableBody = document.getElementById('registrosTableBody');
 const metricasContainer = document.getElementById('metricasContainer');
 const placaExibida = document.getElementById('placaExibida');
 const consumoMedio = document.getElementById('consumoMedio');
 const totalAbastecimentos = document.getElementById('totalAbastecimentos');
+const logoutBtn = document.getElementById('logoutBtn');
 
-// Função para calcular o terceiro valor a partir de dois
+let currentPlate = ''; // Variável para armazenar a placa do veículo logado
+
+// --- Funções de Controle de Tela ---
+function showLoginScreen() {
+    loginScreen.style.display = 'block';
+    appContent.style.display = 'none';
+    loginForm.reset();
+    loginMessage.textContent = '';
+    currentPlate = ''; // Limpa a placa ao sair
+}
+
+function showAppContent(placa) {
+    loginScreen.style.display = 'none';
+    appContent.style.display = 'block';
+    currentPlate = placa.toUpperCase().trim();
+    currentVehiclePlate.textContent = currentPlate; // Exibe a placa no título
+    placaInput.value = currentPlate; // Preenche o hidden input da placa
+    registroForm.reset(); // Limpa o formulário de registro
+    formMessage.textContent = '';
+    buscarRegistrosEAtualizar(currentPlate); // Carrega os dados para a placa logada
+}
+
+// --- Lógica de Login ---
+loginForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const placaDigitada = placaLoginInput.value.toUpperCase().trim();
+    if (placaDigitada) {
+        showAppContent(placaDigitada);
+    } else {
+        mostrarMensagemLogin('Por favor, digite a placa do veículo.', 'danger');
+    }
+});
+
+logoutBtn.addEventListener('click', () => {
+    showLoginScreen();
+});
+
+// Função para mostrar mensagens temporárias na tela de login
+function mostrarMensagemLogin(mensagem, tipo) {
+    loginMessage.textContent = mensagem;
+    loginMessage.className = `mt-3 text-center alert alert-${tipo}`;
+    setTimeout(() => {
+        loginMessage.textContent = '';
+        loginMessage.className = 'mt-3 text-center';
+    }, 5000);
+}
+
+// --- Funções de Cálculo e Validação (Mantidas do código anterior) ---
 function calcularCampoFaltante() {
     let valorLitro = parseFloat(valorLitroInput.value);
     let quantidadeLitros = parseFloat(quantidadeLitrosInput.value);
@@ -40,7 +96,7 @@ valorLitroInput.addEventListener('input', calcularCampoFaltante);
 quantidadeLitrosInput.addEventListener('input', calcularCampoFaltante);
 precoTotalInput.addEventListener('input', calcularCampoFaltante);
 
-// Função para registrar abastecimento
+// --- Função para Registrar Abastecimento (Atualizada para usar currentPlate) ---
 registroForm.addEventListener('submit', async (e) => {
     e.preventDefault();
 
@@ -52,8 +108,8 @@ registroForm.addEventListener('submit', async (e) => {
     }
 
     const registro = {
-        placa: placaInput.value.toUpperCase().trim(),
-        valor_litro: parseFloat(valorLitroInput.value) || null, // Usar null se vazio para Supabase
+        placa: currentPlate, // Usa a placa logada
+        valor_litro: parseFloat(valorLitroInput.value) || null,
         quantidade_litros: parseFloat(quantidadeLitrosInput.value) || null,
         preco_total: parseFloat(precoTotalInput.value) || null,
         quilometragem: parseInt(quilometragemInput.value),
@@ -78,8 +134,8 @@ registroForm.addEventListener('submit', async (e) => {
             console.log('Registro inserido com sucesso:', data);
             mostrarMensagem('Abastecimento registrado com sucesso!', 'success');
             registroForm.reset();
-            placaInput.value = registro.placa; // Mantém a placa preenchida para facilitar
-            buscarRegistrosEAtualizar(registro.placa); // Atualiza os dados da placa atual
+            // Não precisa mais preencher placaInput, pois ele é hidden e já tem currentPlate
+            buscarRegistrosEAtualizar(currentPlate); // Atualiza os dados da placa atual
         }
     } catch (err) {
         console.error('Erro inesperado:', err.message);
@@ -87,7 +143,7 @@ registroForm.addEventListener('submit', async (e) => {
     }
 });
 
-// Função para mostrar mensagens temporárias
+// Função para mostrar mensagens temporárias no formulário de registro
 function mostrarMensagem(mensagem, tipo) {
     formMessage.textContent = mensagem;
     formMessage.className = `mt-3 text-center alert alert-${tipo}`;
@@ -97,7 +153,7 @@ function mostrarMensagem(mensagem, tipo) {
     }, 5000);
 }
 
-// Função para buscar e exibir registros e calcular métricas
+// --- Função para buscar e exibir registros e calcular métricas (Atualizada para usar currentPlate) ---
 async function buscarRegistrosEAtualizar(placa) {
     registrosTableBody.innerHTML = '<tr><td colspan="7" class="text-center">Carregando...</td></tr>';
     metricasContainer.style.display = 'none';
@@ -106,7 +162,7 @@ async function buscarRegistrosEAtualizar(placa) {
         const { data, error } = await supabase
             .from('registros_combustivel')
             .select('*')
-            .eq('placa', placa.toUpperCase().trim())
+            .eq('placa', placa) // Usa a placa passada como argumento
             .order('quilometragem', { ascending: true }); // Ordena pela quilometragem para cálculo de KM/L
 
         if (error) {
@@ -117,7 +173,7 @@ async function buscarRegistrosEAtualizar(placa) {
 
         if (data.length === 0) {
             registrosTableBody.innerHTML = '<tr><td colspan="7" class="text-center">Nenhum registro encontrado para esta placa.</td></tr>';
-            placaExibida.textContent = placa.toUpperCase();
+            placaExibida.textContent = placa;
             consumoMedio.textContent = 'N/A';
             totalAbastecimentos.textContent = '0';
             return;
@@ -133,18 +189,18 @@ async function buscarRegistrosEAtualizar(placa) {
             row.insertCell().textContent = registro.preco_total ? `R$ ${registro.preco_total.toFixed(2)}` : 'N/A';
             row.insertCell().textContent = `${registro.quilometragem} km`;
             row.insertCell().textContent = tipoCombustivelParaTexto(registro.tipo_combustivel);
-
+            
             const acoesCell = row.insertCell();
             const deleteBtn = document.createElement('button');
             deleteBtn.textContent = 'Excluir';
             deleteBtn.classList.add('btn', 'btn-danger', 'btn-sm');
-            deleteBtn.onclick = () => excluirRegistro(registro.id, placa);
+            deleteBtn.onclick = () => excluirRegistro(registro.id, placa); // Passa a placa atual
             acoesCell.appendChild(deleteBtn);
         });
 
         // Calcular Métricas
         calcularMetricas(data);
-        placaExibida.textContent = placa.toUpperCase();
+        placaExibida.textContent = placa;
         metricasContainer.style.display = 'block';
 
     } catch (err) {
@@ -165,16 +221,6 @@ function tipoCombustivelParaTexto(valor) {
 
 // Função para calcular métricas (KM/L)
 function calcularMetricas(registros) {
-    let totalKmPercorridos = 0;
-    let totalLitrosConsumidos = 0;
-
-    // Assumimos que os registros estão ordenados por quilometragem (crescente)
-    // Para calcular KM/L, precisamos de pelo menos dois abastecimentos.
-    // O KM/L de um abastecimento é (quilometragem_atual - quilometragem_anterior) / litros_abastecidos_anteriormente.
-    // Isso é um pouco mais complexo e requer considerar o último abastecimento.
-    // Para simplificar para iniciantes, vamos calcular o consumo médio TOTAL
-    // baseado nos primeiros e últimos registros de quilometragem e no total de litros.
-
     if (registros.length < 2) {
         consumoMedio.textContent = 'Necessita de mais de um registro para calcular.';
         totalAbastecimentos.textContent = registros.length;
@@ -184,12 +230,6 @@ function calcularMetricas(registros) {
     const primeiroRegistro = registros[0];
     const ultimoRegistro = registros[registros.length - 1];
 
-    // Total de litros consumidos (desconsiderando o primeiro abastecimento se for o primeiro registro do carro)
-    // O ideal seria usar o delta de litros entre abastecimentos e o delta de KM.
-    // Para uma métrica simples: Some todos os litros após o primeiro abastecimento
-    // E use a diferença entre a última e a primeira quilometragem.
-
-    // Total de litros para cálculo do consumo médio simplificado
     let litrosTotais = 0;
     for (let i = 1; i < registros.length; i++) { // Começa do segundo registro
         if (registros[i].quantidade_litros) {
@@ -208,7 +248,7 @@ function calcularMetricas(registros) {
     totalAbastecimentos.textContent = registros.length;
 }
 
-// Função para excluir registro
+// Função para excluir registro (Atualizada para usar currentPlate)
 async function excluirRegistro(id, placaAtual) {
     if (!confirm('Tem certeza que deseja excluir este registro?')) {
         return;
@@ -233,23 +273,5 @@ async function excluirRegistro(id, placaAtual) {
     }
 }
 
-
-// Event Listener para o botão de consulta
-consultarPlacaBtn.addEventListener('click', () => {
-    const placa = placaConsultaInput.value.toUpperCase().trim();
-    if (placa) {
-        buscarRegistrosEAtualizar(placa);
-    } else {
-        alert('Por favor, digite a placa do veículo para consultar.');
-        registrosTableBody.innerHTML = '<tr><td colspan="7" class="text-center">Nenhum registro encontrado para esta placa.</td></tr>';
-        metricasContainer.style.display = 'none';
-    }
-});
-
-// Carregar registros da placa inserida no formulário ao carregar a página (se houver)
-// Ou uma placa padrão se desejar. Por enquanto, só se a placa for digitada.
-// window.addEventListener('load', () => {
-//     const placaPadrao = 'EXEMPLO0'; // Pode definir uma placa padrão
-//     placaConsultaInput.value = placaPadrao;
-//     buscarRegistrosEAtualizar(placaPadrao);
-// });
+// --- Inicialização: Mostra a tela de login ao carregar a página ---
+document.addEventListener('DOMContentLoaded', showLoginScreen);
